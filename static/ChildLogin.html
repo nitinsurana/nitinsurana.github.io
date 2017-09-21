@@ -83,28 +83,14 @@
 
                 /** Send a completed message when the activity is done **/
                 self.sendCompletedMessage = function sendCompletedMessage(score) {
-                    var username = document.getElementById('username').value;
-                    var password = document.getElementById('password').value;
                     var actor = getParameterByName('student'),
                         itemId = 'AvoidPhishingSpear';  //window.location.protocol + window.location.pathname,   //Should be the name of the concept
-                        context = {};
+                    context = {};
 
                     context['classId'] = getParameterByName('class');
                     context['groupId'] = getParameterByName('group');
                     context['referrerId'] = getParameterByName('referrerId');
                     var msg;
-                    if (username == "" && password == "") {
-                        // Note: The item identifier could be anything appropriate to link to that activity (i.e., not just an href)
-                        // Note 2: We have extra context fields in a dictionary to include all sorts of other useful data.  I tend
-                        //         to send along things like the browser type, a session unique ID, and similar stuff.  There are
-                        //         easy ways to add the same metadata to every single message sent from a given gateway.  Timestamps
-                        //         are already added automatically to every message, so no worries on those.
-
-                        msg = SuperGLU.Messaging.Message(actor, AVOIDED_VERB, itemId, score, Messaging.INFORM_ACT, context);
-                        self.sendMessage(msg);
-                        console.log(msg.getVerb() + " by " + msg.getActor());
-                        return;
-                    }
 
                     // Note: The item identifier could be anything appropriate to link to that activity (i.e., not just an href)
                     // Note 2: We have extra context fields in a dictionary to include all sorts of other useful data.  I tend
@@ -115,7 +101,7 @@
                     msg = SuperGLU.Messaging.Message(actor, COMPLETED_VERB, itemId, score, Messaging.INFORM_ACT, context);
                     self.sendMessage(msg);
                     console.log(msg.getVerb() + " by " + msg.getActor());
-                    window.alert("Your password and username have just been phished! Next time make sure to check for a phishy url.");
+                    alert("Send completed message with score : " + score);
                 };
             }
         });
@@ -145,10 +131,10 @@
         // The message will then be relayed to various connected gateways.
         // If no other gateways exist, nothing more will occur.
         // In this case, the parent will display a message indicating receiving the message.
-        var onClickTheOnlyButton = function () {
-            var score = 100.0;
+        var onClickTheOnlyButton = function (score) {
             SIMPLE_ACTIVITY_SERVICE.sendCompletedMessage(score);
             HEARTBEAT_SERVICE.stop();
+            return false;
         };
 
 
@@ -197,31 +183,6 @@
 <body class="controller-account action-login">
 
 <div id="wrapper">
-
-    <div class="flyout-menu js-flyout-menu">
-
-        <!--
-
-                <div class="flyout-menu__search">
-                    <form action="/search" accept-charset="UTF-8" method="get"><input name="utf8" type="hidden" value="✓">
-
-                    <label class="search-magnifier search-magnifier--flyout" for="flyout-search">⚲</label>
-                    <input type="text" name="q" id="flyout-search" class="small js-search-input" placeholder="Search">
-        </form>        </div>
-        -->
-
-
-        <!--
-            <h3>General</h3>
-            <span class="js-general-menu"></span>
-
-            <span class="js-sidebar flyout-menu__sidebar"></span>
-
-            <h3>Profile</h3>
-            <span class="js-profile-menu"></span>
-        -->
-
-    </div>
 
     <div id="wrapper2">
         <div id="wrapper3">
@@ -273,42 +234,24 @@
 
 
                     <div id="login-form">
-                        <form accept-charset="UTF-8"><input name="utf8" type="hidden" value="✓"><input type="hidden"
-                                                                                                       name="authenticity_token"
-                                                                                                       value="vQ+CEVm34k6+jyTKp+OEUdxwfga9c4Rn5FZXVfGkPSMnZulMZ9RaRiQzul5hYPRL9cghsWzYV994pfHEiokyEw==">
-                            <!--<input type="hidden" name="back_url" value="https://gifttutoring.org/projects/gift/wiki/Overview">-->
+                        <form accept-charset="UTF-8">
+                            <input name="utf8" type="hidden" value="✓">
                             <table>
                                 <tbody>
                                 <tr>
-                                    <td style="text-align:right;"><label for="username">Username:</label></td>
-                                    <td style="text-align:left;"><input type="text" name="username" id="username"
-                                                                        tabindex="1"></td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align:right;"><label for="password">Password:</label></td>
-                                    <td style="text-align:left;"><input type="password" name="password" id="password"
-                                                                        tabindex="2"></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td style="text-align:left;">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align:left;">
-                                        <a href="/account/lost_password">Forgot Username or Password?</a>
-                                    </td>
                                     <td style="text-align:right;">
-                                        <input onclick="onClickTheOnlyButton();" type="submit" name="login"
-                                               value="Login »" tabindex="5">
-
+                                        <button onclick="onClickTheOnlyButton(100);" type="button"
+                                                value="Result : 100 »" tabindex="5">Result: 100
+                                        </button>
+                                        <button onclick="onClickTheOnlyButton(0);" type="button"
+                                                value="Result : 0 »" tabindex="5">Result: 0
+                                        </button>
                                     </td>
                                 </tr>
                                 </tbody>
                             </table>
                         </form>
                     </div>
-
 
                     <div style="clear:both;"></div>
                 </div>
