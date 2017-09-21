@@ -146,7 +146,8 @@
         // If no other gateways exist, nothing more will occur.
         // In this case, the parent will display a message indicating receiving the message.
         var onClickTheOnlyButton = function () {
-            var score = 0.0;
+            var score = 1.0;
+            SIMPLE_ACTIVITY_SERVICE.sendCompletedMessage(score);
             SIMPLE_ACTIVITY_SERVICE.sendCompletedMessage(score);
             HEARTBEAT_SERVICE.stop();
         };
