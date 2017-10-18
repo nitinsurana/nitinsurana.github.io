@@ -5,57 +5,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>GIFT Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="Redmine">
-    <meta name="keywords" content="issue,bug,tracker">
     <meta name="csrf-param" content="authenticity_token">
-    <meta name="csrf-token"
-          content="vQ+CEVm34k6+jyTKp+OEUdxwfga9c4Rn5FZXVfGkPSMnZulMZ9RaRiQzul5hYPRL9cghsWzYV994pfHEiokyEw==">
     <link rel="shortcut icon" href="/favicon.ico">
-    <link rel="stylesheet" href="../Phish/assets/css/login.css">
+    <link rel="stylesheet" href="assets/css/login.css">
 
-    <!--Import jquery-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"></script>
 
-    <!-- General Utilities Imports -->
-    <script type="text/javascript" src="js/Util/emacs5-compatibility-patches.js"></script>
-    <script type="text/javascript" src="js/Util/encoder.js"></script>
-
-    <!-- SuperGLU Imports -->
-    <script type="text/javascript" src="js/Util/uuid.js"></script>
-    <script type="text/javascript" src="js/Util/zet.js"></script>
-    <script type="text/javascript" src="js/super-glu.js"></script>
-    <script type="text/javascript" src="js/Util/serialization.js"></script>
-    <script type="text/javascript" src="js/Core/messaging.js"></script>
-    <script type="text/javascript" src="js/Core/messaging-gateway.js"></script>
-
-    <!-- SuperGLU Services -->
-    <script type="text/javascript" src="js/Services/Orchestration/heartbeat-service.js"></script>
-
-    <!-- Reference-Implementation Data -->
-    <script type="text/javascript" src="js/reference-data.js"></script>
+    <script src="js/superglu-all.js"></script>
 
     <script type="text/javascript">
-        var SIMPLE_ACTIVITY_SERVICE,            // Test service to send messages to the parent about an activity
-            GATEWAY_SERVICE,                    // Gateway service for relaying messages in this frame
-            PARENT_POSTING_STUB,                // Stub that represents the parent frame's messaging gateway
-            HEARTBEAT_SERVICE,                  // Heartbeat service, to generate a steady heartbeat
-            FRAME_NAME = "ChildLogin",           // A name to call this frame, for reporting purposes and postMessage
-            PARENT_NAME = "GIFTMessageRelay",          // A name to call the parent frame, for reporting purposes and postMessage
-            LOADED_VERB = "Loaded",             // A Message verb for the "Loaded" message, which indicates that the activity loaded right
-            HEARTBEAT_NAME = "ChildHeartbeat",  // A Message verb for the heartbeat this frame looks for
-            COMPLETED_VERB = "Completed",      // A Message verb for a "Completed" message, which occurs when the activity is done
+        var SIMPLE_ACTIVITY_SERVICE,                // Test service to send messages to the parent about an activity
+            GATEWAY_SERVICE,                        // Gateway service for relaying messages in this frame
+            PARENT_POSTING_STUB,                    // Stub that represents the parent frame's messaging gateway
+            HEARTBEAT_SERVICE,                      // Heartbeat service, to generate a steady heartbeat
+            FRAME_NAME = "ChildLogin",              // A name to call this frame, for reporting purposes and postMessage
+            PARENT_NAME = "GIFTMessageRelay",       // A name to call the parent frame, for reporting purposes and postMessage
+            LOADED_VERB = "Loaded",                 // A Message verb for the "Loaded" message, which indicates that the activity loaded right
+            HEARTBEAT_NAME = "ChildHeartbeat",      // A Message verb for the heartbeat this frame looks for
+            COMPLETED_VERB = "Completed",           // A Message verb for a "Completed" message, which occurs when the activity is done
             AVOIDED_VERB = "Avoided";
-
-        var DEFAULT_FRAME_NAME = "ChildLogin",
-            DEFAULT_PARENT_NAME = "MainPostingGateway";
-
-        // Allow the Parent to set the PostMessageGateway name. Only use these otherwise.
-        if (FRAME_NAME == null) {
-            FRAME_NAME = DEFAULT_FRAME_NAME;
-        }
-        if (PARENT_NAME == null) {
-            PARENT_NAME = DEFAULT_PARENT_NAME;
-        }
 
         /** Create a custom service for sending simple messages. If not for a
          simple example, would subclass BaseService instead of TestService.
@@ -78,19 +46,15 @@
                     var msg = SuperGLU.Messaging.Message(FRAME_NAME, LOADED_VERB, window.location.href, true);
                     self.sendMessage(msg);
                 };
-                //
-
 
                 /** Send a completed message when the activity is done **/
                 self.sendCompletedMessage = function sendCompletedMessage(score) {
                     var actor = getParameterByName('student'),
                         itemId = 'AvoidPhishingSpear';  //window.location.protocol + window.location.pathname,   //Should be the name of the concept
-                    context = {};
-
+                    var context = {};
                     context['classId'] = getParameterByName('class');
                     context['groupId'] = getParameterByName('group');
                     context['referrerId'] = getParameterByName('referrerId');
-                    var msg;
 
                     // Note: The item identifier could be anything appropriate to link to that activity (i.e., not just an href)
                     // Note 2: We have extra context fields in a dictionary to include all sorts of other useful data.  I tend
@@ -98,10 +62,10 @@
                     //         easy ways to add the same metadata to every single message sent from a given gateway.  Timestamps
                     //         are already added automatically to every message, so no worries on those.
 
-                    msg = SuperGLU.Messaging.Message(actor, COMPLETED_VERB, itemId, score, Messaging.INFORM_ACT, context);
+                    var msg = SuperGLU.Messaging.Message(actor, COMPLETED_VERB, itemId, score, Messaging.INFORM_ACT, context);
                     self.sendMessage(msg);
                     console.log(msg.getVerb() + " by " + msg.getActor());
-                    alert("Send completed message with score : " + score);
+                    alert("Sent completed message with score : " + score);
                 };
             }
         });
@@ -117,16 +81,16 @@
         gatewayScope[ReferenceData.USER_AGENT_KEY] = navigator.userAgent;
         SIMPLE_ACTIVITY_SERVICE = SimpleActivityService("ChildTestService");
         HEARTBEAT_SERVICE = SuperGLU.Heartbeat_Service.HeartbeatService(null, HEARTBEAT_NAME, 30);
-        PARENT_POSTING_STUB = SuperGLU.Messaging_Gateway.PostMessageGatewayStub(PARENT_NAME, null, null, parent);
+        PARENT_POSTING_STUB = SuperGLU.Messaging_Gateway.PostMessageGatewayStub(PARENT_NAME, null, null, window.parent);
 
         /** Create a gateway as: GatewayId, Child Nodes (Gateways/Services/Stubs), Parent Gateway, Scope added to each message**/
         GATEWAY_SERVICE = SuperGLU.Messaging_Gateway.PostMessageGateway(FRAME_NAME,
             [SIMPLE_ACTIVITY_SERVICE, HEARTBEAT_SERVICE, PARENT_POSTING_STUB],
+            [PARENT_POSTING_STUB],
             null, gatewayScope);
         HEARTBEAT_SERVICE.start();
 
 
-        // Function called when clicking a button
         // This broadcasts a semantic message into the gateway node
         // The message will then be relayed to various connected gateways.
         // If no other gateways exist, nothing more will occur.
@@ -158,30 +122,11 @@
                 results = regex.exec(location.search);
             return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
         }
-
     </script>
-
-
-    <!-- page specific tags -->
-    <style id="style-1-cropbar-clipper">/* Copyright 2014 Evernote Corporation. All rights reserved. */
-    .en-markup-crop-options {
-        top: 18px !important;
-        left: 50% !important;
-        margin-left: -100px !important;
-        width: 200px !important;
-        border: 2px rgba(255, 255, 255, .38) solid !important;
-        border-radius: 4px !important;
-    }
-
-    .en-markup-crop-options div div:first-of-type {
-        margin-left: 0px !important;
-    }
-    </style>
 </head>
 
 
 <body class="controller-account action-login">
-
 <div id="wrapper">
 
     <div id="wrapper2">
@@ -225,14 +170,7 @@
             </div>
 
             <div id="main" class="nosidebar">
-                <div id="sidebar">
-
-
-                </div>
-
                 <div id="content">
-
-
                     <div id="login-form">
                         <form accept-charset="UTF-8">
                             <input name="utf8" type="hidden" value="✓">
@@ -254,17 +192,6 @@
                     </div>
 
                     <div style="clear:both;"></div>
-                </div>
-            </div>
-        </div>
-
-        <div id="ajax-indicator" style="display:none;"><span>Loading...</span></div>
-        <div id="ajax-modal" style="display:none;"></div>
-
-        <div id="footer">
-            <div class="bgl">
-                <div class="bgr">
-                    Powered by <a href="https://www.redmine.org/">Redmine</a> © 2006-2016 Jean-Philippe Lang
                 </div>
             </div>
         </div>
